@@ -134,14 +134,16 @@ If the container is unhealthy (you can see its status via *docker ps* command) y
 
 **Note:** if you have problems with the healthcheck not changing to unhealthy when it should (you see errors in the logs, for example) have a look at the health check reported by *docker inspect CONTAINER_ID* if matches the following one:
 
-        "Healthcheck": {
-                "Test": [
-                    "CMD-SHELL",
-                    "grep OK /healthcheck || exit 1"
-                ],
-                "Interval": 30000000000,
-                "Timeout": 3000000000,
-                "Retries": 3
-            }
+```yaml
+"Healthcheck": {
+  "Test": [
+    "CMD-SHELL",
+    "grep OK /healthcheck || exit 1"
+  ],
+  "Interval": 30000000000,
+  "Timeout": 3000000000,
+  "Retries": 3
+}
+```
 
 I'm using *Watchtower* container to update my containers automatically and I've seen that even if the image is updated, the new container still uses the old HEALTHCHECK. If it happens, just stop and remove the container and re-create it.
