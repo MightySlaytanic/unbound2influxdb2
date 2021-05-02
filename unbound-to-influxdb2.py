@@ -228,7 +228,7 @@ if __name__ == '__main__':
                 try:
                     if DEBUG:
                         print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Uploading data for host {host}[ENC:{host_encryption_flag}]({host_name})...")
-                    client = InfluxDBClient(url=f"http://{INFLUX_HOST}:{INFLUX_PORT}", token=INFLUX_TOKEN, org="alixnetwork", timeout=10)
+                    client = InfluxDBClient(url=f"http://{INFLUX_HOST}:{INFLUX_PORT}", token=INFLUX_TOKEN, org="alixnetwork")
                     write_api = client.write_api(write_options=SYNCHRONOUS)
 
                     write_api.write(
