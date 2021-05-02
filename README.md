@@ -48,73 +48,81 @@ With the previous example, you have to mount a local folder with the following f
 
 *NOTE*: you must specify S or G if the unbound service is configured with *control-use-cert: yes*, which is the default, otherwise if that option is set to *no* you must specify N. In a small home setup you can have the same *.key* and *.pem* files (also *unbound_server.key* which is not needed by this container) used by all your *unbound* services, but this is your choice. BTW, if you want to use SSL and your Unbound service is running within a container, you can get the files from a running container named *secns-unbound1* with the following command
 
-    # The path within the container is valid for secns/unbound image, adjust it with your unbound image
-    mkdir temp
-    docker cp secns-unbound1:/usr/local/etc/unbound/unbound_control.key temp/
-    docker cp secns-unbound1:/usr/local/etc/unbound/unbound_control.pem temp/
-    docker cp secns-unbound1:/usr/local/etc/unbound/unbound_server.pem temp/
-    # The following is not needed by unbound2influxdb2 image, you can retrieve 
-    # it if you need to use the same SSL files on another unbound instance
-    docker cp secns-unbound1:/usr/local/etc/unbound/unbound_server.key temp/
+```bash
+# The path within the container is valid for secns/unbound image, adjust it with your unbound image
+mkdir temp
+docker cp secns-unbound1:/usr/local/etc/unbound/unbound_control.key temp/
+docker cp secns-unbound1:/usr/local/etc/unbound/unbound_control.pem temp/
+docker cp secns-unbound1:/usr/local/etc/unbound/unbound_server.pem temp/
+# The following is not needed by unbound2influxdb2 image, you can retrieve 
+# it if you need to use the same SSL files on another unbound instance
+docker cp secns-unbound1:/usr/local/etc/unbound/unbound_server.key temp/
+```
 
 # Usage example
 
 You can specify *-t* option which will be passed to **/unbound-to-influxdb2.py** within the container to output all the values obtained from unbound servers to screen, without uploading nothing to the influxdb server. Remember to specify *-t* also as *docker run* option in order to see the output immediately (otherwise it will be printed on output buffer flush)
 
-    docker run -t --rm \
-    -e INFLUX_HOST="influxdb_server_ip" \
-    -e INFLUX_PORT=8086 \
-    -e INFLUX_ORGANIZATION="org-name" \
-    -e INFLUX_BUCKET="bucket-name" \
-    -e INFLUX_SERVICE_TAG="unbound-test" \
-    -e INFLUX_TOKEN="influx_token" \
-    -e UNBOUND_HOSTS="p1:port1:tag_name1:enc_flag,ip2:port2:tag_name2:enc_flag" \
-    -e CONFIG_DIR="/etc/unbound" \
-    -e VERBOSE="True" \
-    -v /LOCAL_PATH/etc/unbound:/etc/unbound \
-    giannicostanzi/unbound2influxdb2 -t
+```bash
+docker run -t --rm \
+-e INFLUX_HOST="influxdb_server_ip" \
+-e INFLUX_PORT=8086 \
+-e INFLUX_ORGANIZATION="org-name" \
+-e INFLUX_BUCKET="bucket-name" \
+-e INFLUX_SERVICE_TAG="unbound-test" \
+-e INFLUX_TOKEN="influx_token" \
+-e UNBOUND_HOSTS="p1:port1:tag_name1:enc_flag,ip2:port2:tag_name2:enc_flag" \
+-e CONFIG_DIR="/etc/unbound" \
+-e VERBOSE="True" \
+-v /LOCAL_PATH/etc/unbound:/etc/unbound \
+giannicostanzi/unbound2influxdb2 -t
+```
 
 
 If you remove the *-t* option passed to the container, collected data will be uploaded to influxdb bucket in a *stats*measurement. The following is an example of a non-debug run:
 
-    docker run -d  --name="unbound2influxdb2-stats" \
-	-e INFLUX_HOST="192.168.0.1" \
-	-e INFLUX_PORT="8086" \
-	-e INFLUX_ORGANIZATION="org-name" \
-	-e INFLUX_BUCKET="bucket-name" \
-    -e INFLUX_SERVICE_TAG="unbound-test" \
-	-e INFLUX_TOKEN="XXXXXXXXXX_INFLUX_TOKEN_XXXXXXXXXX" \
-	-e UNBOUND_HOSTS="192.168.0.2:50080:rpi3,192.168.0.3:80:rpi4" \
-	-e RUN_EVERY_SECONDS="60" \
-    -e CONFIG_DIR="/etc/unbound" \
-	-e INFLUX_SERVICE_TAG="my_service_tag"
-	giannicostanzi/unbound2influxdb2
+```bash
+docker run -d  --name="unbound2influxdb2-stats" \
+-e INFLUX_HOST="192.168.0.1" \
+-e INFLUX_PORT="8086" \
+-e INFLUX_ORGANIZATION="org-name" \
+-e INFLUX_BUCKET="bucket-name" \
+-e INFLUX_SERVICE_TAG="unbound-test" \
+-e INFLUX_TOKEN="XXXXXXXXXX_INFLUX_TOKEN_XXXXXXXXXX" \
+-e UNBOUND_HOSTS="192.168.0.2:50080:rpi3,192.168.0.3:80:rpi4" \
+-e RUN_EVERY_SECONDS="60" \
+-e CONFIG_DIR="/etc/unbound" \
+-e INFLUX_SERVICE_TAG="my_service_tag"
+giannicostanzi/unbound2influxdb2
+```
 
 These are the *fields* uploaded for *stats* measurement (I'll show the influxdb query used to view them all):
-   
-    from(bucket: "dns-resolvers-bucket")
-      |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-      |> filter(fn: (r) => r["_measurement"] == "stats")
-      |> filter(fn: (r) => r["service"] == "unbound")
-      |> filter(fn: (r) => 
-        r["_field"] == "num_cachehits" 
-        or r["_field"] == "num_cachemiss" 
-        or r["_field"] == "num_expired" 
-        or r["_field"] == "num_prefetch" 
-        or r["_field"] == "num_queries" 
-        or r["_field"] == "num_queries_ip_ratelimited" 
-        or r["_field"] == "num_recursivereplies" 
-        or r["_field"] == "percent_cachehits" 
-        or r["_field"] == "recursion_time_avg" 
-        or r["_field"] == "recursion_time_median" 
-        or r["_field"] == "requestlist_current_all" 
-        or r["_field"] == "requestlist_avg" 
-        or r["_field"] == "requestlist_current_user" 
-        or r["_field"] == "requestlist_exceeded" 
-        or r["_field"] == "requestlist_max" 
-        or r["_field"] == "requestlist_overwritten" 
-        or r["_field"] == "tcpusage" 
-        or r["_field"] == "uptime")
+ 
+```bash
+from(bucket: "dns-resolvers-bucket")
+|> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+|> filter(fn: (r) => r["_measurement"] == "stats")
+|> filter(fn: (r) => r["service"] == "unbound")
+|> filter(fn: (r) => 
+r["_field"] == "num_cachehits" 
+	or r["_field"] == "num_cachemiss" 
+	or r["_field"] == "num_expired" 
+	or r["_field"] == "num_prefetch" 
+	or r["_field"] == "num_queries" 
+	or r["_field"] == "num_queries_ip_ratelimited" 
+	or r["_field"] == "num_recursivereplies" 
+	or r["_field"] == "percent_cachehits" 
+	or r["_field"] == "recursion_time_avg" 
+	or r["_field"] == "recursion_time_median" 
+	or r["_field"] == "requestlist_current_all" 
+	or r["_field"] == "requestlist_avg" 
+	or r["_field"] == "requestlist_current_user" 
+	or r["_field"] == "requestlist_exceeded" 
+	or r["_field"] == "requestlist_max" 
+	or r["_field"] == "requestlist_overwritten" 
+	or r["_field"] == "tcpusage" 
+	or r["_field"] == "uptime")
+```
 
 Each record has also a tag named *host* that contains the names passed in *UNBOUND_HOSTS* environment variable and a *service* tag named as the *INFLUX_SERVICE_TAG* environment variable.
 
@@ -126,14 +134,16 @@ If the container is unhealthy (you can see its status via *docker ps* command) y
 
 **Note:** if you have problems with the healthcheck not changing to unhealthy when it should (you see errors in the logs, for example) have a look at the health check reported by *docker inspect CONTAINER_ID* if matches the following one:
 
-        "Healthcheck": {
-                "Test": [
-                    "CMD-SHELL",
-                    "grep OK /healthcheck || exit 1"
-                ],
-                "Interval": 30000000000,
-                "Timeout": 3000000000,
-                "Retries": 3
-            }
+```yaml
+"Healthcheck": {
+  "Test": [
+    "CMD-SHELL",
+    "grep OK /healthcheck || exit 1"
+  ],
+  "Interval": 30000000000,
+  "Timeout": 3000000000,
+  "Retries": 3
+}
+```
 
 I'm using *Watchtower* container to update my containers automatically and I've seen that even if the image is updated, the new container still uses the old HEALTHCHECK. If it happens, just stop and remove the container and re-create it.
