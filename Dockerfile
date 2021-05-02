@@ -19,4 +19,4 @@ ENV UNBOUND_HOSTS="ip1:port1:name1:enc_flag,ip2:port2:name2:enc_flag"
 ENV INFLUX_SERVICE_TAG="unbound"
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
             CMD grep OK /healthcheck || exit 1
-ENTRYPOINT [ "python", "unbound-to-influxdb2.py" ]
+ENTRYPOINT [ "python", "/unbound-to-influxdb2.py" ]
