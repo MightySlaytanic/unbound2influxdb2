@@ -27,6 +27,7 @@ from datetime import datetime
 from time import sleep
 from os import getenv
 from os.path import realpath, dirname, isfile
+from signal import signal, SIGTERM
 
 from unbound_console import RemoteControl
 from influxdb_client import InfluxDBClient
@@ -54,6 +55,12 @@ RUN_EVERY_SECONDS = int(getenv("RUN_EVERY_SECONDS"))
 VERBOSE = getenv("VERBOSE")
 
 DEBUG = 0
+
+
+def sigterm_handler(signum, frame):
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] SIGTERM received, shutting down..", file=sys.stderr)
+    sys.exit(0)
+
 
 def set_failed_flag():
     with open(HEALTHCHECK_FILE, "w") as healthcheck_file:
@@ -87,7 +94,10 @@ def get_ssl_files(encryption_flag, dir_name):
 
     return (server_cert, client_cert, client_key)
 
+
 if __name__ == '__main__':
+    signal(SIGTERM, sigterm_handler)
+
     if VERBOSE.lower() == "true":
         DEBUG = 1
 
