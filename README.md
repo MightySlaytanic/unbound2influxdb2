@@ -92,7 +92,7 @@ docker run -d  --name="unbound2influxdb2-stats" \
 -e UNBOUND_HOSTS="192.168.0.2:50080:rpi3,192.168.0.3:80:rpi4" \
 -e RUN_EVERY_SECONDS="60" \
 -e CONFIG_DIR="/etc/unbound" \
--e INFLUX_SERVICE_TAG="my_service_tag"
+-e INFLUX_SERVICE_TAG="my_service_tag" \
 giannicostanzi/unbound2influxdb2
 ```
 
