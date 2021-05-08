@@ -1,3 +1,7 @@
+# Changelog
+
+* **1.3**: upgraded Python base image from 3.9.4-alpine to 3.9.5-alpine
+
 # Sources
 
 You can find Dockerfile and unbound-to-influxdb2.py sources on GitHub:
