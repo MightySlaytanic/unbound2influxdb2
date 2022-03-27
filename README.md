@@ -6,6 +6,8 @@
 * **1.4.2**: upgraded Python base image to 3.10.0-alpine
 * **1.4.3**: fixed InfluxDBClient initialization org parameter
 * **1.4.4**: upgraded Python base image to 3.10.2-alpine3.15
+* **1.4.5**: upgraded Python base image to 3.11.0a6-alpine3.15
+
 
 
 # Sources
