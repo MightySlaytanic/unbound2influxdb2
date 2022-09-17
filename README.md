@@ -8,19 +8,25 @@
 * **1.4.4**: upgraded Python base image to 3.10.2-alpine3.15
 * **1.4.5**: upgraded Python base image to 3.11.0a6-alpine3.15
 * **1.4.6**: upgraded Python base image to 3.11.0b3-alpine3.15
+* **1.4.7**: upgraded Python base image to 3.11.0rc2-alpine3.16
+
+# Info
+
+You can find my series of articles about my pihole/unbound setup monitored via pihole2influxdb2 and unbound2influxdb2 at the following page:
+<http://giannicostanzi.medium.com>
 
 # Sources
 
 You can find Dockerfile and unbound-to-influxdb2.py sources on GitHub:
-https://github.com/MightySlaytanic/unbound2influxdb2
+<https://github.com/MightySlaytanic/unbound2influxdb2>
 
 # Docker Hub Image
 
-https://hub.docker.com/repository/docker/giannicostanzi/unbound2influxdb2
+<https://hub.docker.com/repository/docker/giannicostanzi/unbound2influxdb2>
 
 # Base Image
 
-The base image is the official *python:3.9.4-alpine* on top of which we install *influxdb_client* and *unbound_console*  (via *pip*).
+The base image is the official *python:3.x.y-alpine* on top of which we install *influxdb_client* and *unbound_console*  (via *pip*).
 
 # Environment Variables
 
