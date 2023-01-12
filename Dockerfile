@@ -1,8 +1,8 @@
-FROM python:3.11.0rc2-alpine3.16 AS builder
+FROM python:3.12.0a4-alpine3.16 AS builder
 COPY requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir --upgrade pip && pip3 install --user --no-cache-dir -r /tmp/requirements.txt
 
-FROM python:3.11.0rc2-alpine3.16
+FROM python:3.12.0a4-alpine3.16
 COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local:$PATH
 COPY unbound-to-influxdb2.py /unbound-to-influxdb2.py
