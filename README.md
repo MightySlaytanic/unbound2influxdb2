@@ -13,6 +13,7 @@
 * **1.4.9**: forced setuptools>=65.5.1 due to vulnerabilities
 * **1.4.10**: upgraded Python base image to 3.12.0-alpine3.18
 * **1.5.0**: there is a small *breaking change* in the INFLUX_HOST variable that you must pass to the script. Now you must specify http:// or https:// in front of the url or IP address of your influxdb host.
+* **1.5.1**: upgraded Python base image to 3.13.0a6-alpine3.18
 
 # Info
 
